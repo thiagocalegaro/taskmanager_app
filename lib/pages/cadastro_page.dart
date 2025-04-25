@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/pages/home_page.dart';
 
-import 'cadastro_page.dart';
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class CadastroPage extends StatefulWidget {
+  const CadastroPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<CadastroPage> createState() => _CadastroPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _CadastroPageState extends State<CadastroPage> {
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Login Page'),
+        title: const Text('Cadastro'),
       ),
       body: SingleChildScrollView(
         child: Center(
           child: Form(
-            key: _formKey, // ✅ Aqui está a key
+            key: _formKey,
             child: Column(
               children: [
                 const SizedBox(height: 20),
@@ -32,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: SizedBox(
                     width: 200,
                     height: 150,
-                    child: Image.asset('images/logo.png'),
+                    child: Image.asset('images/logo-flutter.png'),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -65,70 +62,63 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: 'Entre com a senha',
-
                       labelText: 'Senha',
+                      hintText: 'Entre com senha válida',
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Botão de login
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(color: Colors.white, fontSize: 15),
-                      ),
+                  child: TextFormField(
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Confirmação de Senha',
+                      hintText: 'Entre com senha válida',
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Esqueceu a senha?',
-                        style: TextStyle(color: Colors.blue, fontSize: 12),
-                      ),
-                    ),
-                    const SizedBox(width: 10), // Espaço entre os botões
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
+                Container(
+                  height: 50,
+                  width: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CadastroPage(),
+                            builder: (context) => const HomePage(),
                           ),
                         );
-                      },
-                      child: const Text(
-                        'Não tem uma conta? Cadastre-se',
-                        style: TextStyle(color: Colors.blue, fontSize: 12),
-                      ),
+                      }
+                    },
+                    child: const Text(
+                      'Cadastrar',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                  ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Já tem conta? Faça login',
+                    style: TextStyle(color: Colors.blue, fontSize: 15),
+                  ),
                 ),
                 const SizedBox(height: 10),
               ],
@@ -139,3 +129,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

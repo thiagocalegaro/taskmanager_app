@@ -112,7 +112,7 @@ class _AddTasksPageState extends State<AddTasksPage> {
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Data',
-                      hintText: 'AAAA-MM-DD',   // só dica visual
+                      hintText: 'AAAA-MM-DD',   // visual
                     ),
                     keyboardType: TextInputType.datetime,
                     validator: (value) {
