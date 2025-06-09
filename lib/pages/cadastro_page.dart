@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/pages/home_page.dart';
+import 'package:task_manager/pages/login_page.dart';
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({Key? key}) : super(key: key);
@@ -29,7 +29,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   child: SizedBox(
                     width: 200,
                     height: 150,
-                    child: Image.asset('images/logo-flutter.png'),
+                    child: Image.asset('images/logo.png'),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -86,27 +86,32 @@ class _CadastroPageState extends State<CadastroPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  height: 50,
-                  width: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomePage(),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      'Cadastrar',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text(
+                        'Cadastrar',
+                        style: TextStyle(color: Colors.white, fontSize: 15),
+                      ),
                     ),
                   ),
                 ),

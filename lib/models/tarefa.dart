@@ -1,20 +1,20 @@
-class Tarefa {
-  final String nome;
-  final String categoria;
-  final String? descricao;
-  final DateTime data;
+// models/tarefa.dart
+import 'package:flutter/material.dart';
 
-  Tarefa ({
+class Tarefa {
+  String nome;
+  String categoria;
+  String? descricao; // Description can be optional
+  DateTime data;
+  bool isCompleted;
+  bool isExpanded; // To handle UI expansion state
+
+  Tarefa({
     required this.nome,
     required this.categoria,
     this.descricao,
     required this.data,
+    this.isCompleted = false,
+    this.isExpanded = false,
   });
-
-  @override
-  String toString() {
-    return 'Tarefa{nome: $nome, categoria: $categoria, descricao: $descricao, data: $data}';
-  }
 }
-
-

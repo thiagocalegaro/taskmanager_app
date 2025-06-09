@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/pages/home_page.dart';
-
-import 'cadastro_page.dart';
+import 'package:task_manager/pages/cadastro_page.dart';
+import 'package:task_manager/models/usuario.dart';
+import 'package:task_manager/pages/main_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,6 +10,7 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
+
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
@@ -18,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Login Page'),
+        title: const Text('Login'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -90,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const HomePage(),
+                              builder: (context) => const MainScreen(),
                             ),
                           );
                         }
