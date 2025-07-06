@@ -1,35 +1,44 @@
 class Usuario {
-  String? id;
-  String? nome;
-  String? email;
-  String? password;
-  String? token;
+  final int? id;
+  final String? username;
+  final String? email;
+  final String? password;
 
   Usuario({
     this.id,
-    this.nome,
+    this.username,
     this.email,
     this.password,
-    this.token,
   });
 
-  factory Usuario.fromJson(Map<String, dynamic> json) {
+  factory Usuario.fromMap(Map<String, dynamic> map) {
     return Usuario(
-      id: json['id'],
-      nome: json['nome'],
-      email: json['email'],
-      password: json['password'],
-      token: json['token'],
+      id: map['id'],
+      username: map['username'],
+      email: map['email'],
+      password: map['password'],
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'nome': nome,
+      'username': username,
       'email': email,
       'password': password,
-      'token': token,
     };
+  }
+  Usuario copyWith({
+    int? id,
+    String? username,
+    String? email,
+    String? password,
+  }) {
+    return Usuario(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      password: password ?? this.password,
+    );
   }
 }

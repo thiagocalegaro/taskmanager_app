@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/pages/home_page.dart';
 import 'package:task_manager/pages/cadastro_page.dart';
-import 'package:task_manager/models/usuario.dart';
 import 'package:task_manager/pages/main_screen.dart';
+import 'package:task_manager/services/usuario_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,6 +14,54 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _authService = UsuarioService();
+  bool _isLoading = false;
+  bool _isPasswordVisible = false;
+
+  Future<void> _login() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true; //habilita o loading
+      });
+
+      try {
+        final user = await _authService.login(
+          _emailController.text,
+          _passwordController.text,
+        );
+
+        if (user != null && mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('E-mail ou senha inválidos.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Center(
           child: Form(
-            key: _formKey, // ✅ Aqui está a key
+            key: _formKey,
             child: Column(
               children: [
                 const SizedBox(height: 20),
@@ -34,13 +81,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: SizedBox(
                     width: 200,
                     height: 150,
-                    child: Image.asset('images/logo.png'),
+                    child: Image.asset('assets/images/logo.png'),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TextFormField(
+                    controller: _emailController, // ✅ ADICIONADO
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo obrigatório';
@@ -52,29 +100,39 @@ class _LoginPageState extends State<LoginPage> {
                       labelText: 'Email',
                       hintText: 'Entre com email válido',
                     ),
+                    keyboardType: TextInputType.emailAddress,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TextFormField(
-                    obscureText: true,
+                    controller: _passwordController,
+                    obscureText: !_isPasswordVisible,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo obrigatório';
                       }
                       return null;
                     },
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
                       hintText: 'Entre com a senha',
-
                       labelText: 'Senha',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                          },
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Botão de login
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: SizedBox(
@@ -87,17 +145,14 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainScreen(),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text(
+                      onPressed: _isLoading ? null : _login,
+                      child: _isLoading
+                          ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                      )
+                          : const Text(
                         'Login',
                         style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
@@ -106,16 +161,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 10),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Esqueceu a senha?',
-                        style: TextStyle(color: Colors.blue, fontSize: 12),
-                      ),
-                    ),
-                    const SizedBox(width: 10), // Espaço entre os botões
                     TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -141,3 +188,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

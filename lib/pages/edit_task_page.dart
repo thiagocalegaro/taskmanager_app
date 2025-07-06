@@ -1,33 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_manager/models/tarefa.dart';
 import 'package:task_manager/services/tarefa_service.dart';
-import 'package:task_manager/services/usuario_service.dart';
+import 'package:task_manager/models/tarefa.dart';
 
-class AddTasksPage extends StatefulWidget {
-  const AddTasksPage({super.key});
+class EditTaskPage extends StatefulWidget {
+  final Tarefa tarefa;
+
+  const EditTaskPage({required this.tarefa, super.key});
 
   @override
-  State<AddTasksPage> createState() => _AddTasksPageState();
+  State<EditTaskPage> createState() => _EditTaskPageState();
 }
 
-class _AddTasksPageState extends State<AddTasksPage> {
+class _EditTaskPageState extends State<EditTaskPage> {
   final _formKey = GlobalKey<FormState>();
-  final _userService = UsuarioService();
   final _tarefaService = TarefaService();
   bool _isLoading = false;
 
-  final nomeController = TextEditingController();
-  final descricaoController = TextEditingController();
-  final dataController = TextEditingController();
-
+  late final TextEditingController nomeController;
+  late final TextEditingController descricaoController;
+  late final TextEditingController dataController;
   DateTime? _dataHoraSelecionada;
+  String? categoriaSelecionada;
 
   final List<String> categorias = [
     'Viagem', 'Trabalho', 'Lazer', 'Rotina', 'Compromisso', 'Pessoal', 'Estudos',
   ];
-  String? categoriaSelecionada;
+
+  @override
+  void initState() {
+    super.initState();
+    nomeController = TextEditingController(text: widget.tarefa.nome);
+    descricaoController = TextEditingController(text: widget.tarefa.descricao);
+    _dataHoraSelecionada = widget.tarefa.data;
+    dataController = TextEditingController(
+      text: DateFormat('dd/MM/yyyy HH:mm', 'pt_BR').format(_dataHoraSelecionada!),
+    );
+    categoriaSelecionada = widget.tarefa.categoria;
+  }
 
   @override
   void dispose() {
@@ -44,26 +54,19 @@ class _AddTasksPageState extends State<AddTasksPage> {
     final dataSelecionada = await showDatePicker(
       context: context,
       initialDate: dataInicial,
-      firstDate: hoje,
+      firstDate: DateTime(2000),
       lastDate: DateTime(hoje.year + 5),
       locale: const Locale('pt', 'BR'),
     );
-
     if (dataSelecionada == null) return;
 
     final horaInicial = TimeOfDay.fromDateTime(_dataHoraSelecionada ?? dataInicial);
     final horaSelecionada = await showTimePicker(
       context: context,
       initialTime: horaInicial,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
     );
 
-    if (horaSelecionada != null) {
+    if (horaSelecionada != null && mounted) {
       setState(() {
         _dataHoraSelecionada = DateTime(
           dataSelecionada.year, dataSelecionada.month, dataSelecionada.day,
@@ -74,54 +77,20 @@ class _AddTasksPageState extends State<AddTasksPage> {
     }
   }
 
-  Future<void> _salvarTarefa() async {
+  Future<void> _salvarAlteracoes() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
-
-      final prefs = await SharedPreferences.getInstance();
-      final usuarioId = prefs.getInt('user_id');
-
-      if (usuarioId == null) {
-        if(mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Erro: Sessão de usuário não encontrada!'), backgroundColor: Colors.red));
-          setState(() => _isLoading = false);
-        }
-        return;
-      }
-
-      final usuarioLogado = await _userService.getUserById(usuarioId);
-
-      if (usuarioLogado == null) {
-        if(mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Erro: Usuário não encontrado no banco!'), backgroundColor: Colors.red));
-          setState(() => _isLoading = false);
-        }
-        return;
-      }
-
-      final novaTarefa = Tarefa(
+      final tarefaAtualizada = widget.tarefa.copyWith(
         nome: nomeController.text.trim(),
         categoria: categoriaSelecionada!,
         data: _dataHoraSelecionada!,
         descricao: descricaoController.text.trim(),
-        usuario: usuarioLogado,
       );
 
-      final idDaTarefaCriada = await _tarefaService.insertTarefa(novaTarefa);
+      await _tarefaService.updateTarefa(tarefaAtualizada);
 
       if (mounted) {
-        if (idDaTarefaCriada != null) {
-
-          final tarefaSalva = novaTarefa.copyWith(id: idDaTarefaCriada);
-          Navigator.pop(context, true);
-
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erro ao salvar a tarefa.'), backgroundColor: Colors.red),
-          );
-        }
-
-        setState(() => _isLoading = false);
+        Navigator.pop(context, true);
       }
     }
   }
@@ -129,7 +98,7 @@ class _AddTasksPageState extends State<AddTasksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Tarefa'), centerTitle: true),
+      appBar: AppBar(title: const Text('Editar Tarefa'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Form(
@@ -139,15 +108,14 @@ class _AddTasksPageState extends State<AddTasksPage> {
             children: [
               TextFormField(
                 controller: nomeController,
-                decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Nome da Tarefa', hintText: 'Ex: Ir ao supermercado'),
-                validator: (value) => (value == null || value.isEmpty) ? 'O nome da tarefa é obrigatório.' : null,
+                decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Nome da Tarefa'),
+                validator: (value) => (value == null || value.isEmpty) ? 'O nome é obrigatório.' : null,
               ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: descricaoController,
-                decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Descrição (Opcional)', alignLabelWithHint: true),
+                decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Descrição (Opcional)'),
                 maxLines: 4,
-                textInputAction: TextInputAction.newline,
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
@@ -163,14 +131,14 @@ class _AddTasksPageState extends State<AddTasksPage> {
                 readOnly: true,
                 decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Data e Hora', suffixIcon: Icon(Icons.calendar_today_outlined)),
                 onTap: _selecionarDataHora,
-                validator: (value) => (_dataHoraSelecionada == null) ? 'A data e hora são obrigatórias.' : null,
+                validator: (value) => (_dataHoraSelecionada == null) ? 'A data é obrigatória.' : null,
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: _isLoading ? null : _salvarTarefa,
+                onPressed: _isLoading ? null : _salvarAlteracoes,
                 child: _isLoading
-                    ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                    : const Text('Salvar Tarefa', style: TextStyle(fontSize: 16)),
+                    ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white))
+                    : const Text('Salvar Alterações', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),
