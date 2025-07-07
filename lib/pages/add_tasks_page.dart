@@ -25,7 +25,7 @@ class _AddTasksPageState extends State<AddTasksPage> {
   DateTime? _dataHoraSelecionada;
 
   final List<String> categorias = [
-    'Viagem', 'Trabalho', 'Lazer', 'Rotina', 'Compromisso', 'Pessoal', 'Estudos',
+    'Viagem', 'Trabalho', 'Lazer', 'Rotina', 'Pessoal', 'Estudos',
   ];
   String? categoriaSelecionada;
 

@@ -22,7 +22,7 @@ class HomePageState extends State<HomePage> {
   DateTimeRange? _intervaloDataFiltrado;
   bool? _filtroConcluido;
   final List<String> _todasAsCategorias = [
-    'Pessoal', 'Estudos', 'Trabalho', 'Viagem', 'Lazer', 'Rotina', 'Compromisso'
+    'Pessoal', 'Estudos', 'Trabalho', 'Viagem', 'Lazer', 'Rotina'
   ];
 
   @override
