@@ -88,7 +88,7 @@ class ProfilePageState extends State<ProfilePage> {
     final newName = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Alterar Nome'),
+          title: const Text('Alterar Nome', textAlign: TextAlign.center,),
           content: TextField(controller: nameController, autofocus: true, decoration: const InputDecoration(hintText: 'Digite seu nome')),
           actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancelar')),
@@ -202,6 +202,10 @@ class ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Perfil"),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset('assets/images/logo-cru.png'),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -219,7 +223,7 @@ class ProfilePageState extends State<ProfilePage> {
                     backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
                     child: _imageFile == null
                         ? Text(
-                      _userName.isNotEmpty ? _userName.substring(0, 2).toUpperCase() : 'OR',
+                      _userName.isNotEmpty ? _userName.substring(0, 2).toUpperCase() : 'N/A',
                       style: const TextStyle(fontSize: 40, color: Colors.black54),
                     )
                         : null,
@@ -227,7 +231,7 @@ class ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 10),
                   const Text(
                     "Alterar foto",
-                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: Colors.indigo, fontWeight: FontWeight.w500),
                   )
                 ],
               ),
@@ -235,13 +239,24 @@ class ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_userName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              IconButton(icon: const Icon(Icons.edit_outlined, size: 20, color: Colors.grey), onPressed: _showEditNameDialog),
+              const Opacity(
+                opacity: 0,
+                child: IconButton(icon: Icon(Icons.edit_outlined), onPressed: null),
+              ),
+              Expanded(
+                child: Text(
+                  _userName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 20, color: Colors.grey),
+                onPressed: _showEditNameDialog,
+              ),
             ],
           ),
-          const SizedBox(height: 24),
           const Divider(),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16.0),

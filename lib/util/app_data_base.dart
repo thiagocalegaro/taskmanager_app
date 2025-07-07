@@ -45,7 +45,7 @@ class AppDataBase {
               username TEXT NOT NULL,
               email TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
-              image_path TEXT
+              image_path TEXT,
             )
           ''');
         },
